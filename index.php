@@ -262,7 +262,71 @@ $user = isset($_SESSION['user_id']) ? fetchOne("SELECT * FROM users WHERE id=?",
         </div>
     </div>
 </div>
+<?php elseif ($page === 'chat' && $user): ?>
+<div class="max-w-3xl mx-auto px-4 py-6">
+    <div class="bg-white rounded-3xl shadow-2xl overflow-hidden">
+        <div class="g-primary text-white p-5 flex items-center gap-3">
+            <div class="w-14 h-14 bg-white/20 rounded-2xl flex items-center justify-center text-3xl">🤖</div>
+            <div>
+                <h1 class="text-xl font-black">المدرّس الذكي</h1>
+                <p class="text-xs opacity-90">● متصل الآن - اسألني أي شيء</p>
+            </div>
+        </div>
+        <div id="chatBox" class="chat-container bg-gray-50">
+            <div class="bubble-ai">👋 أهلاً <?= e($user['full_name']) ?>! أنا مدرّسك الذكي، اسألني عن أي مادة دراسية.</div>
+        </div>
+        <div class="p-4 bg-white border-t flex gap-2">
+            <input type="text" id="msgInput" placeholder="اكتب سؤالك هنا..." class="flex-1 px-4 py-3 border-2 rounded-xl focus:border-emerald-500 outline-none" onkeypress="if(event.key==='Enter')sendMsg()">
+            <button onclick="sendMsg()" class="g-primary text-white px-6 py-3 rounded-xl font-bold">إرسال</button>
+        </div>
+    </div>
+</div>
 
+<script>
+const chatBox = document.getElementById('chatBox');
+const input = document.getElementById('msgInput');
+
+function addBubble(text, isUser) {
+    const div = document.createElement('div');
+    div.className = isUser ? 'bubble-user' : 'bubble-ai';
+    div.textContent = text;
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function addTyping() {
+    const div = document.createElement('div');
+    div.id = 'typing';
+    div.className = 'bubble-ai typing';
+    div.innerHTML = '<span></span><span></span><span></span>';
+    chatBox.appendChild(div);
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+function sendMsg() {
+    const msg = input.value.trim();
+    if (!msg) return;
+    addBubble(msg, true);
+    input.value = '';
+    addTyping();
+    
+    fetch('?page=chat_ajax', {
+        method: 'POST',
+        headers: {'Content-Type':'application/x-www-form-urlencoded'},
+        body: 'message=' + encodeURIComponent(msg)
+    })
+    .then(r => r.json())
+    .then(d => {
+        document.getElementById('typing')?.remove();
+        if (d.ok) addBubble(d.reply, false);
+        else addBubble('حدث خطأ، حاول تاني.', false);
+    })
+    .catch(() => {
+        document.getElementById('typing')?.remove();
+        addBubble('تعذر الاتصال.', false);
+    });
+}
+</script>
 <?php elseif ($page === 'admin' && !empty($_SESSION['admin'])): 
     $stats = [
         'طلاب' => fetchOne("SELECT COUNT(*) c FROM users WHERE role='student'")['c'],
