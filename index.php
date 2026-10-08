@@ -78,7 +78,7 @@ if (($_POST['action'] ?? '') === 'login') {
         $_SESSION['user_id'] = $u['id'];
         $_SESSION['name'] = $u['full_name'];
         $_SESSION['role'] = $u['role'];
-        header('Location: ?page=dashboard'); exit;
+        header('Location: '); exit;
     } else $msg = 'بيانات غير صحيحة';
 }
 
@@ -217,8 +217,32 @@ $user = isset($_SESSION['user_id']) ? fetchOne("SELECT * FROM users WHERE id=?",
     </div>
 </div>
 
-<?php elseif ($page === 'dashboard' && $user): ?>
 <div class="max-w-4xl mx-auto px-4 py-10 fade">
+    <div class="g-hero text-white rounded-2xl p-8 mb-6">
+        <h1 class="text-3xl font-black mb-2">أهلاً <?= e($user['full_name']) ?> 👋</h1>
+        <p><?= e($user['grade'] ?: 'ولي أمر') ?></p>
+    </div>
+    <div class="grid md:grid-cols-3 gap-6">
+        <a href="?page=chat" class="bg-white p-6 rounded-2xl shadow text-center card-hover block">
+            <div class="text-5xl mb-3">🤖</div>
+            <h3 class="font-bold text-xl mb-2">المدرّس الذكي</h3>
+            <p class="text-gray-500 text-sm mb-3">اسأل أي سؤال</p>
+            <span class="g-primary text-white px-4 py-2 rounded-lg font-bold text-sm inline-block">ابدأ المحادثة</span>
+        </a>
+        <div class="bg-white p-6 rounded-2xl shadow text-center">
+            <div class="text-5xl mb-3">📚</div>
+            <h3 class="font-bold text-xl mb-2">موادي</h3>
+            <p class="text-gray-500 text-sm mb-3">دروس صفك</p>
+            <span class="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg font-bold text-sm inline-block">قريباً</span>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow text-center">
+            <div class="text-5xl mb-3">📊</div>
+            <h3 class="font-bold text-xl mb-2">تقدمي</h3>
+            <p class="text-gray-500 text-sm mb-3">مستواك الدراسي</p>
+            <span class="bg-gray-200 text-gray-500 px-4 py-2 rounded-lg font-bold text-sm inline-block">قريباً</span>
+        </div>
+    </div>
+</div><div class="max-w-4xl mx-auto px-4 py-10 fade">
     <div class="g-hero text-white rounded-2xl p-8 mb-6">
         <h1 class="text-3xl font-black mb-2">أهلاً <?= e($user['full_name']) ?> 👋</h1>
         <p><?= e($user['grade'] ?: 'ولي أمر') ?></p>
